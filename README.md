@@ -16,13 +16,12 @@
 - **Фреймворки:** PyTorch, Hugging Face (transformers, peft, accelerate, datasets)
 - **Метод оптимизации:** LoRA (дообучение только адаптеров без изменения базовых весов)
 
-## Структура проекта
 ├── fine_tuning/
 │ └── train.py
 ├── inference/
 │ └── chat.py
 ├── example_dataset.json
-├── requirements.txt
+── requirements.txt
 └── README.md
 
 ## Быстрый старт
