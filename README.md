@@ -1,97 +1,41 @@
-# Fine-tuning и запуск моделей с LoRA
+🤖 Дообучение стиля общения LLM-модели (Fine-tuning с LoRA)
+Учебный кейс для портфолио, демонстрирующий адаптацию тональности (Tone of Voice) открытой языковой модели под конкретные задачи с использованием технологии LoRA (Low-Rank Adaptation).
+💼 О проекте и бизнес-ценность
+Дообучение (fine-tuning) позволяет «вшить» правила и стиль общения напрямую в веса модели. Это решает ключевые бизнес-задачи:
+Экономия ресурсов: Устраняет необходимость передавать длинные системные промпты и примеры при каждом запросе, экономя токены и время.
+Стабильность бренда: Гарантирует единый корпоративный стиль (дружелюбный, официальный, с юмором) во всех автоматизированных ответах.
+Локальность и безопасность: Весь процесс (от обучения до генерации) выполняется на локальном оборудовании без передачи данных во внешние API.
+🛠 Технологический стек
+Язык: Python
+Фреймворки: PyTorch, Hugging Face (transformers, peft, accelerate, datasets)
+Метод оптимизации: LoRA (дообучение только адаптеров без изменения базовых весов)
+📂 Структура проекта
 
-Проект содержит:
-- скрипт дообучения модели LoRA: `fine_tuning/train.py`
-- скрипт запуска чата: `inference/chat.py`
-- пример датасета: `example_dataset.json`
+12345678
+🚀 Быстрый старт
+1. Установка
+Рекомендуется использовать виртуальное окружение (venv):
+bash
 
-## Структура
+12
+Для авторизации в Hugging Face (скачивание моделей):
+bash
 
-```text
-.
-├── fine_tuning/
-│   ├── train.py
-│   └── README.md
-├── inference/
-│   ├── chat.py
-│   └── README.md
-├── example_dataset.json
-├── requirements.txt
-└── README.md
-```
+1
+2. Дообучение (Fine-tuning)
+Запуск обучения на процессоре (CPU). Процесс занимает ~15-30 минут в зависимости от железа.
+bash
 
-## Установка
+1
+Для запуска на GPU добавьте флаг --use_4bit и --device cuda.
+3. Запуск чата (Инференс)
+Проверка работы модели после обучения:
+bash
 
-Если вы работаете в уже созданном `venv`:
-
-```powershell
-python -m pip install --upgrade pip
-python -m pip install -r .\requirements.txt
-```
-
-Для RTX 5060 можно поставить PyTorch с CUDA 12.8:
-
-```powershell
-python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-```
-
-Проверка:
-
-```powershell
-python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
-```
-
-## Датасет
-
-В репозитории уже есть готовый пример: `example_dataset.json`.
-
-Поддерживаются `.json` и `.jsonl` в форматах:
-- `{"text": "..."}`
-- `{"instruction": "...", "output": "..."}`
-- `{"prompt": "...", "completion": "..."}`
-- `{"input": "...", "output": "..."}`
-
-## Быстрый старт
-
-### CPU
-
-```powershell
-python .\fine_tuning\train.py --model_name "microsoft/DialoGPT-small" --dataset_path ".\example_dataset.json" --output_dir ".\fine_tuning\lora_model_cpu" --num_train_epochs 3 --per_device_train_batch_size 1 --gradient_accumulation_steps 1 --device cpu
-```
-
-### GPU
-
-```powershell
-python .\fine_tuning\train.py --model_name "microsoft/DialoGPT-small" --dataset_path ".\example_dataset.json" --output_dir ".\fine_tuning\lora_model_gpu" --use_4bit --num_train_epochs 3 --device cuda
-```
-
-Примечания:
-- на CPU не используйте `--use_4bit`
-- на слабом железе уменьшайте `--per_device_train_batch_size`
-- базовая модель скачивается автоматически при первом запуске
-
-## Проверочный запуск на маленькой модели
-
-```powershell
-python .\fine_tuning\train.py --model_name "sshleifer/tiny-gpt2" --dataset_path ".\example_dataset.json" --output_dir ".\fine_tuning\tmp_cpu_test" --num_train_epochs 1 --per_device_train_batch_size 1 --gradient_accumulation_steps 1 --max_length 32 --device cpu
-```
-
-## Запуск чата после обучения
-
-```powershell
-python .\inference\chat.py --base_model "microsoft/DialoGPT-small" --lora_model ".\fine_tuning\lora_model_cpu"
-```
-
-## Что важно знать
-
-- `fine_tuning/train.py` теперь поддерживает `--device auto|cpu|cuda`
-- если указать `--device cpu`, скрипт автоматически отключит 4-bit quantization
-- на Windows/Powershell убраны проблемные Unicode-символы из логов
-
-## Полезные модели для старта
-
-- `microsoft/DialoGPT-small`
-- `distilgpt2`
-- `gpt2`
-- `sshleifer/tiny-gpt2` для smoke-test
+1
+📊 Результаты работы
+.jpg)
+⚠️ Важное примечание к результату:
+В данном учебном кейсе используется ультра-легкая демонстрационная модель (~50 МБ), не имеющая глубокого предобучения на русском языке. Поэтому генерируемый текст может содержать фактические неточности или артефакты.
+Главная цель проекта — успешная демонстрация корректной работы пайплайна fine-tuning, снижения функции потерь (Loss) и изменения паттернов генерации. В реальных production-задачах для достижения высокого качества используются модели большего размера (от 500 МБ) в комбинации с RAG-системами.
 
